@@ -31,12 +31,19 @@ namespace Company.Function
     {
        IConfidentialClientApplication confidentialClientApplication;
        HttpClient httpClient;
+
+       static string APIM_MANAGEMENT_ENDPOINT_FORMAT = "https://management.azure.com/subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.ApiManagement/service/{2}/subscriptions/{3}";
+       readonly string APIM_MANAGEMENT_ENDPOINT;
         public UpdateApimKeys() {
             confidentialClientApplication = ConfidentialClientApplicationBuilder.Create(System.Environment.GetEnvironmentVariable("AzureAD__ClientID"))
               .WithClientSecret(System.Environment.GetEnvironmentVariable("AzureAD__ClientSecret"))
               .WithAuthority(new Uri($"{System.Environment.GetEnvironmentVariable("AzureAD__Instance")}/{System.Environment.GetEnvironmentVariable("AzureAD__Tenant")}"))
               .Build();
             httpClient = HttpClientFactory.Create();
+            APIM_MANAGEMENT_ENDPOINT = string.Format(APIM_MANAGEMENT_ENDPOINT_FORMAT, System.Environment.GetEnvironmentVariable("APIM__AzureSubscriptionID"), 
+                                                                                      System.Environment.GetEnvironmentVariable("APIM__ResourceGroupName"),
+                                                                                      System.Environment.GetEnvironmentVariable("APIM__ServiceName"),
+                                                                                      System.Environment.GetEnvironmentVariable("APIM__ApimSubscriptionID"));
         }
 
         [FunctionName("RegeneratePrimaryKey")]
@@ -50,7 +57,7 @@ namespace Company.Function
 
             Keys apimKeys = new Keys();
 
-            using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://management.azure.com/subscriptions/dcf66641-6312-4ee1-b296-723bb0a999ba/resourceGroups/rg-apim-ussc-demo/providers/Microsoft.ApiManagement/service/apim-dev-ussc-demo/subscriptions/6169bbb8a952b1005f070001/listSecrets?api-version=2020-12-01"))
+            using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{APIM_MANAGEMENT_ENDPOINT}/listSecrets?api-version=2020-12-01"))
             {
               requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.AccessToken);
 
@@ -60,14 +67,14 @@ namespace Company.Function
               apimKeys.OriginalKey = secrets.primaryKey;
             }
 
-            using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://management.azure.com/subscriptions/dcf66641-6312-4ee1-b296-723bb0a999ba/resourceGroups/rg-apim-ussc-demo/providers/Microsoft.ApiManagement/service/apim-dev-ussc-demo/subscriptions/6169bbb8a952b1005f070001/regeneratePrimaryKey?api-version=2020-12-01"))
+            using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{APIM_MANAGEMENT_ENDPOINT}/regeneratePrimaryKey?api-version=2020-12-01"))
             {
               requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.AccessToken);
 
               var apimRegeneratePrimaryKeyResult = await httpClient.SendAsync(requestMessage);
             }
 
-            using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://management.azure.com/subscriptions/dcf66641-6312-4ee1-b296-723bb0a999ba/resourceGroups/rg-apim-ussc-demo/providers/Microsoft.ApiManagement/service/apim-dev-ussc-demo/subscriptions/6169bbb8a952b1005f070001/listSecrets?api-version=2020-12-01"))
+            using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{APIM_MANAGEMENT_ENDPOINT}/listSecrets?api-version=2020-12-01"))
             {
               requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.AccessToken);
 
