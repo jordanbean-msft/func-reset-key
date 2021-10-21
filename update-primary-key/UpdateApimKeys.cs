@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace Company.Function
 {
@@ -22,9 +23,13 @@ namespace Company.Function
       public string NewKey { get; set; }
     }
 
-    public class ApiManagementSubscriptionListSecrets {
+    public class ApiManagementSubscriptionSecrets {
       public string primaryKey { get; set; }
       public string secondaryKey { get; set; }
+    }
+
+    public class ApiManagementSubscriptionProperties {
+      public ApiManagementSubscriptionSecrets properties { get; set; }
     }
 
     public class UpdateApimKeys
@@ -57,16 +62,18 @@ namespace Company.Function
 
             Keys apimKeys = new Keys();
 
+            //get original APIM primary subscription key
             using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{APIM_MANAGEMENT_ENDPOINT}/listSecrets?api-version=2020-12-01"))
             {
               requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.AccessToken);
 
               var apimListSecretsResult = await httpClient.SendAsync(requestMessage);
 
-              var secrets = await apimListSecretsResult.Content.ReadFromJsonAsync<ApiManagementSubscriptionListSecrets>();
+              var secrets = await apimListSecretsResult.Content.ReadFromJsonAsync<ApiManagementSubscriptionSecrets>();
               apimKeys.OriginalKey = secrets.primaryKey;
             }
 
+            //regenerate primary key
             using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{APIM_MANAGEMENT_ENDPOINT}/regeneratePrimaryKey?api-version=2020-12-01"))
             {
               requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.AccessToken);
@@ -74,13 +81,14 @@ namespace Company.Function
               var apimRegeneratePrimaryKeyResult = await httpClient.SendAsync(requestMessage);
             }
 
+            //get new APIM primary subscription key
             using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{APIM_MANAGEMENT_ENDPOINT}/listSecrets?api-version=2020-12-01"))
             {
               requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.AccessToken);
 
               var apimListSecretsResult = await httpClient.SendAsync(requestMessage);
 
-              var secrets = await apimListSecretsResult.Content.ReadFromJsonAsync<ApiManagementSubscriptionListSecrets>();
+              var secrets = await apimListSecretsResult.Content.ReadFromJsonAsync<ApiManagementSubscriptionSecrets>();
               apimKeys.NewKey = secrets.primaryKey;
             }
            
@@ -94,17 +102,55 @@ namespace Company.Function
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            string name = req.Query["name"];
+            var tokenResult = await confidentialClientApplication.AcquireTokenForClient(new List<string>{"https://management.azure.com/.default"}).ExecuteAsync();
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            Keys apimKeys = new Keys();
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
+            //get original APIM primary subscription key
+            using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{APIM_MANAGEMENT_ENDPOINT}/listSecrets?api-version=2020-12-01"))
+            {
+              requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.AccessToken);
 
-            return new OkObjectResult(responseMessage);
+              var apimListSecretsResult = await httpClient.SendAsync(requestMessage);
+
+              var secrets = await apimListSecretsResult.Content.ReadFromJsonAsync<ApiManagementSubscriptionSecrets>();
+              apimKeys.OriginalKey = secrets.primaryKey;
+            }
+
+            //set keys
+            using(var requestMessage = new HttpRequestMessage(HttpMethod.Patch, $"{APIM_MANAGEMENT_ENDPOINT}?api-version=2020-12-01"))
+            {
+              requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.AccessToken);
+
+              string requestBody = String.Empty;
+              using(StreamReader streamReader = new StreamReader(req.Body)) {
+                requestBody = await streamReader.ReadToEndAsync();
+              }
+              ApiManagementSubscriptionSecrets newKeys = JsonConvert.DeserializeObject<ApiManagementSubscriptionSecrets>(requestBody);
+
+              if(String.IsNullOrEmpty(newKeys.primaryKey) || String.IsNullOrEmpty(newKeys.secondaryKey)) {
+                throw new ArgumentNullException("PrimaryKey and/or SecondaryKey must not be NULL");
+              }
+              
+              ApiManagementSubscriptionProperties apiManagementSubscriptionProperties = new ApiManagementSubscriptionProperties();
+              apiManagementSubscriptionProperties.properties = newKeys;
+              requestMessage.Content = new StringContent(JsonConvert.SerializeObject(apiManagementSubscriptionProperties), Encoding.UTF8, "application/json");
+
+              var apimRegeneratePrimaryKeyResult = await httpClient.SendAsync(requestMessage);
+            }
+
+            //get new APIM primary subscription key
+            using(var requestMessage = new HttpRequestMessage(HttpMethod.Post, $"{APIM_MANAGEMENT_ENDPOINT}/listSecrets?api-version=2020-12-01"))
+            {
+              requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", tokenResult.AccessToken);
+
+              var apimListSecretsResult = await httpClient.SendAsync(requestMessage);
+
+              var secrets = await apimListSecretsResult.Content.ReadFromJsonAsync<ApiManagementSubscriptionSecrets>();
+              apimKeys.NewKey = secrets.primaryKey;
+            }
+           
+            return new OkObjectResult(apimKeys);
         }
     }
 }
