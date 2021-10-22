@@ -12,9 +12,9 @@ import { LogLevel } from "@azure/msal-browser";
  */
 export const msalConfig = {
     auth: {
-        clientId: "db6ca66c-26a2-4b31-98b3-3d95b8d925cc",
+        clientId: "8c9ff9d1-2af4-4768-b035-0c187740d5ac",
         authority: "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47",
-        redirectUri: "http://localhost:3000"
+        redirectUri: "https://spa-reactKey-ussc-demo"
     },
     cache: {
         cacheLocation: "sessionStorage", // This configures where your cache will be stored
@@ -56,7 +56,7 @@ export const loginRequest = {
 };
 
 export const backendApiRequest = {
-  scopes: ["api://d48e2086-e03d-4195-a028-cd578af7d96f/access_as_user"]
+  scopes: ["api://3a7f7e1b-2e3d-4626-81de-40b1b9236264/access_as_user"]
 }
 
 /**
@@ -68,5 +68,5 @@ export const graphConfig = {
 };
 
 export const backendApiConfig = {
-    endpoint: "https://react-backend-api-demo.azurewebsites.net/api/callbackendapiwithsubscriptionkey"
+    endpoint: "https://func-reactKey-ussc-demo.azurewebsites.net/api/callbackendapiwithsubscriptionkey"
 };
