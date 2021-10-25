@@ -84,12 +84,6 @@ Click on the **Add a client application** button and add the app ID of the front
 
 ![authorizedClientApplication](.img/authorizedClientApplication.png)
 
-## KeyVault setup
-
-![keyVaultAccessPolicies](.img/keyVaultAccessPolicies.png)
-
-Finally, you notice that the managed identity of each Azure Function app has access to pull secrets from KeyVault.
-
 ## Deployment
 
 1.  Create the front-end React App's AzureAD app registration as instructed above
