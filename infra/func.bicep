@@ -82,17 +82,23 @@ resource backendForFrontEndFunction 'Microsoft.Web/sites@2021-01-15' = {
   }
 }
 
+resource backendForFrontendCors 'Microsoft.Web/sites/config@2021-02-01' = {
+  name: '${backendForFrontEndFunction.name}/web'
+  properties: {
+    cors: {
+      allowedOrigins: [
+        '*'
+      ]
+    }
+  }
+}
+
 resource backendForFrontendAuthentication 'Microsoft.Web/sites/config@2021-02-01' = {
   name: '${backendForFrontEndFunction.name}/authsettingsV2'
   properties: {
     globalValidation: {
       requireAuthentication: true
       unauthenticatedClientAction: 'RedirectToLoginPage'
-    }
-    cors: {
-      allowedOrigins: [
-        '*'
-      ]
     }
     identityProviders: {
       azureActiveDirectory: {

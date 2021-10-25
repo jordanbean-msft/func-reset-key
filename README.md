@@ -125,14 +125,14 @@ Finally, you will need to grant your backend for front-end and the backend API a
 
     ```shell
     cd func-backend-api-with-key
-    func azure functionapp publish func-backendApi-reactKey-ussc-demo 
+    func azure functionapp publish func-backendApi-reactKey-ussc-demo
     ```
 
 1.  Deploy the backend for front-end (that attaches the subscription key & calls the backend API). Customize the Azure Function name as appropriate.
 
     ```shell
     cd react-app-backend
-    func azure functionapp publish func-backendForFrontEnd-reactKey-ussc-demo    
+    func azure functionapp publish func-backendForFrontEnd-reactKey-ussc-demo  
     ```
 
 1.  Update the `react-app/src/authConfig.js` file with the appropriate values
