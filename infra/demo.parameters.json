@@ -15,7 +15,7 @@
       "value": "SubscriptionKey"
     },
     "subscriptionKeySecretValue": {
-      "value": "1234567890"
+      "value": ""
     },
     "backendForFrontEndClientId": {
       "value": "3a7f7e1b-2e3d-4626-81de-40b1b9236264"

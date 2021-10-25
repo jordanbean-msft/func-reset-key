@@ -19,7 +19,7 @@ namespace func_backend_api_with_key
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            var subscriptionKey = System.Environment.GetEnvironmentVariable("SubscriptionKey");
+            var subscriptionKey = System.Environment.GetEnvironmentVariable("BackendAPI__SubscriptionKey");
 
             var result = "{ \"status\": \"Not authorized to query data\"}";
 

@@ -14,7 +14,7 @@ export const msalConfig = {
     auth: {
         clientId: "8c9ff9d1-2af4-4768-b035-0c187740d5ac",
         authority: "https://login.microsoftonline.com/72f988bf-86f1-41af-91ab-2d7cd011db47",
-        redirectUri: "https://spa-reactKey-ussc-demo"
+        redirectUri: "https://sareactkeyusscdemo.z21.web.core.windows.net/"
     },
     cache: {
         cacheLocation: "sessionStorage", // This configures where your cache will be stored
@@ -68,5 +68,5 @@ export const graphConfig = {
 };
 
 export const backendApiConfig = {
-    endpoint: "https://func-reactKey-ussc-demo.azurewebsites.net/api/callbackendapiwithsubscriptionkey"
+    endpoint: "https://func-backendForFrontEnd-reactKey-ussc-demo.azurewebsites.net/api/callbackendapiwithsubscriptionkey"
 };
