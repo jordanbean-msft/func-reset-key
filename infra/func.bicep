@@ -105,7 +105,7 @@ resource backendForFrontendAuthentication 'Microsoft.Web/sites/config@2021-02-01
         registration: {
           clientId: backendForFrontEndClientId
           clientSecretSettingName: backendForFrontEndClientSecretConfigurationName
-          openIdIssuer: 'https://login.microsoftonline.com/${subscription().tenantId}/v2.0'
+          openIdIssuer: 'https://login.microsoftonline.com/${subscription().tenantId}'
         }
         validation: {
           allowedAudiences: [

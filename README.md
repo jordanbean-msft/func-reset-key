@@ -148,6 +148,18 @@ Click on the **Add a client application** button and add the app ID of the front
 
 1.  Navigate to the URL of the front-end
 
+### Application
+
+You can signin using the **Sign-in*button.
+
+![signin](.img/signin.png)
+
+You can retrieve data (using Auth Code Flow /w PKCE).
+
+![requestData](.img/requestData.png)
+
+![retrieveData](.img/retrieveData.png)
+
 ## How to regenerate APIM subscription keys
 
 ![resetApimSubscriptionPrimaryKeyFunction](.img/resetApimSubscriptionPrimaryKeyFunction.png)
