@@ -63,7 +63,7 @@ resource backendForFrontEndFunction 'Microsoft.Web/sites@2021-01-15' = {
         }
         {
           name: backendForFrontEndClientSecretConfigurationName
-          value: '@Microsoft.KeYvault(VaultName=${keyVaultName};SecretName=${backendForFrontEndSecretName})'
+          value: '@Microsoft.KeyVault(VaultName=${keyVaultName};SecretName=${backendForFrontEndSecretName})'
         }
         {
           name: 'BackendAPI__Uri'

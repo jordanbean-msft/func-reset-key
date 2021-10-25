@@ -26,7 +26,7 @@ In this example, the backend API stores a subscription key in its Configuration 
 
 ![backendApiConfiguration](.img/backendApiConfiguration.png)
 
-It then validates this subscription key before returning data (`/func-backend-api-with-key/GetBackendData.cs`).
+It then validates this subscription key before returning data (`/backend-api/GetBackendData.cs`).
 
 ```csharp
 var subscriptionKey = System.Environment.GetEnvironmentVariable("BackendAPI__SubscriptionKey");
@@ -88,7 +88,7 @@ Click on the **Add a client application** button and add the app ID of the front
 
 ![keyVaultAccessPolicies](.img/keyVaultAccessPolicies.png)
 
-Finally, you will need to grant your backend for front-end and the backend API access to pull the subscription key from KeyVault.
+Finally, you notice that the managed identity of each Azure Function app has access to pull secrets from KeyVault.
 
 ## Deployment
 
@@ -124,7 +124,7 @@ Finally, you will need to grant your backend for front-end and the backend API a
 1.  Deploy the backend API service (that validates the subscription key & returns data). Customize the Azure Function name as appropriate.
 
     ```shell
-    cd func-backend-api-with-key
+    cd backend-api
     func azure functionapp publish func-backendApi-reactKey-ussc-demo
     ```
 
