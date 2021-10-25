@@ -64,13 +64,6 @@ module keyVaultDeployment 'keyVault.bicep' = {
   }
 }
 
-module staticWebAppDeployment 'staticWebApp.bicep' = {
-  name: 'staticWebAppDeployment'
-  params: {
-    longName: longName
-  }
-}
-
 output storageAccountName string = storageDeployment.outputs.storageAccountName
 output logAnalyticsWorkspaceName string = loggingDeployment.outputs.logAnalyticsWorkspaceName
 output backendApiFunctionAppName string = backendApiFunctionAppName
